@@ -104,16 +104,14 @@ app.use(helmet());
 app.use(
   helmet.dnsPrefetchControl({
     allow: true,
-  })
-);
-//demander qu'un navigateur applique toujours l'exigence de transparence du certificat SSL !
-app.use(
+  }),
   helmet.expectCt({
     maxAge:0,
-    enforce: true,
+    enforce: true,//demander qu'un navigateur applique toujours l'exigence de transparence du certificat SSL !
     //reportUri: "https://example.com/report", Pourrait être intérresant de se prévoir une url pour l'admin avec aussi 
   })
 );
+
 
 // ATTENTION cette protection contre les reflextive XSS pourrait être la porte ouverte pour les attaques XS search.. :
 //https://infosecwriteups.com/xss-auditor-the-protector-of-unprotected-f900a5e15b7b
