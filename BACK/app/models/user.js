@@ -236,7 +236,7 @@ class User {
   static async emailverified(id) {
 
     const {
-      rows
+      rows,
     } = await db.query('UPDATE "user" SET verifyemail=TRUE WHERE id = $1 RETURNING verifyemail;', [
       id,
     ]);
@@ -251,18 +251,12 @@ class User {
 
 
 
-   async updatePwd(password, id) {
+    async updatePwd() {
     const {
       rows,
-    } = await db.query(
-      `UPDATE "user" SET password= $1 WHERE id = $2;`,
-      [
-        password, id
-      ]);
-      this.id = rows[0].id;
-    console.log(
-      `Le password de l'id ${this.id} a été mise à jour !`
-    );
+    } = await db.query(`UPDATE "user" SET password= $1 WHERE id = $2;`,[this.password, this.id]);
+    
+    console.log(`Le password de l'id ${this.id} a été mise à jour !`);
   }
 
 

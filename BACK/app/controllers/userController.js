@@ -7,7 +7,16 @@ const jsonwebtoken = require('jsonwebtoken');
 const {
   message
 } = require('../schemas/userLoginSchema');
-const {emailheaderVerify, emailfooterVerify, emailfooterUpdate, emailTextUpdate, emailTextUpdateNewEmail, emailFooterUpdateNewEmail, emailTextUpdateNewPassword, emailFooterNewPassword} = require('../email/html')
+const {
+  emailheaderVerify,
+  emailfooterVerify,
+  emailfooterUpdate,
+  emailTextUpdate,
+  emailTextUpdateNewEmail,
+  emailFooterUpdateNewEmail,
+  emailTextUpdateNewPassword,
+  emailFooterNewPassword
+} = require('../email/html')
 
 
 /**
@@ -253,7 +262,7 @@ const userController = {
           to: `${userNowInDb.emailAddress}`, // le ou les receveurs => `${request.body.emailAddress}`
           subject: `Les gardiens de la légende : merci de confirmer votre email`, // le sujet du mail
           text: `Bonjour ${userNowInDb.firstName} ${userNowInDb.lastName}, merci de cliquer sur le lien pour vérifier votre email auprés du club de jeu Les gardiens de la légende.`, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
-          html: emailheaderVerify+`<h3>Bonjour <span class="username"> ${userNowInDb.firstName} ${userNowInDb.lastName}, </span> </h3> <br>
+          html: emailheaderVerify + `<h3>Bonjour <span class="username"> ${userNowInDb.firstName} ${userNowInDb.lastName}, </span> </h3> <br>
               <p>Vous souhaitez vous inscrire au club de jeux des gardiens de la legende.</p> <br> 
               <p>Merci de cliquer sur le lien pour vérifier votre email auprés du club de jeu Les gardiens de la légende. </p> <br>
               <a href="${link}">cliquez ici pour vérifier votre email. </a> <br>` + emailfooterVerify,
@@ -456,8 +465,8 @@ const userController = {
           from: 'lesgardiensdelalegende@gmail.com', //l'envoyeur
           to: `${newUser.emailAddress}`, // le ou les receveurs => `${newUser.emailAddress}`
           subject: `Vos modification d'information sur le site des Gardiens de la légende à été pris en compte ! ✔`, // le sujet du mail
-          text: `Bonjour ${newUser.firstName} ${newUser.lastName},`+emailTextUpdate, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
-          html: emailheaderVerify+`<h3>Bonjour <span class="username"> ${newUser.firstName} ${newUser.lastName}, </span> </h3> <br>`+emailfooterUpdate, // le contenu du mail en format html.
+          text: `Bonjour ${newUser.firstName} ${newUser.lastName},` + emailTextUpdate, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
+          html: emailheaderVerify + `<h3>Bonjour <span class="username"> ${newUser.firstName} ${newUser.lastName}, </span> </h3> <br>` + emailfooterUpdate, // le contenu du mail en format html.
         });
 
         console.log("Message sent: %s", info.messageId);
@@ -496,8 +505,8 @@ const userController = {
             from: 'lesgardiensdelalegende@gmail.com', //l'envoyeur
             to: `${userIdinDb.emailAddress}`, // ici le receveur est l'ancien mail donné par le user
             subject: `Vos modification d'information sur le site des Gardiens de la légende à été pris en compte ! ✔`, // le sujet du mail
-            text: `Bonjour ${newUser.firstName} ${newUser.lastName},`+emailTextUpdateNewEmail, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
-            html: emailheaderVerify+`<h3>Bonjour <span class="username"> ${newUser.firstName} ${newUser.lastName}, </span> </h3> <br>`+emailFooterUpdateNewEmail, // le contenu du mail en format html.
+            text: `Bonjour ${newUser.firstName} ${newUser.lastName},` + emailTextUpdateNewEmail, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
+            html: emailheaderVerify + `<h3>Bonjour <span class="username"> ${newUser.firstName} ${newUser.lastName}, </span> </h3> <br>` + emailFooterUpdateNewEmail, // le contenu du mail en format html.
           });
 
           console.log("Message sent: %s", info.messageId);
@@ -564,20 +573,26 @@ const userController = {
 
       if (userInDb.verifyemail) {
         console.log(`Le mail ${userInDb.emailAddress} à déja été authentifié avec succés !`);
-        res.status(200).render('verifyEmail', {userInDb});
+        res.status(200).render('verifyEmail', {
+          userInDb
+        });
 
 
       } else if (!decodedToken.userId === userInDb.id && decodedToken.iss == userInDb.pseudo) {
         console.log(`une érreur est apparu =>`, err)
         //return res.status(401).json(`la validation de votre email a échoué`);
-        return res.status(401).render('verifyEmailFail', {userInDb});;
+        return res.status(401).render('verifyEmailFail', {
+          userInDb
+        });;
 
       } else {
 
         await User.emailverified(userInDb.id);
 
         console.log(`Le mail ${userInDb.emailAddress} à été authentifié avec succés !`);
-        res.status(200).render('verifyEmailWin', {userInDb});
+        res.status(200).render('verifyEmailWin', {
+          userInDb
+        });
         //res.status(200).json(`Bonjour ${userInDb.pseudo}, votre mail a été authentifié avec succés ! Vous pouvez désormais fermer cette page.`)
       }
 
@@ -664,11 +679,11 @@ const userController = {
           to: `${userInDb.emailAddress}`, // le ou les receveurs => `${request.body.emailAddress}`
           subject: `Merci de confirmer votre email`, // le sujet du mail
           text: `Bonjour ${userInDb.firstName} ${userInDb.lastName}, merci de cliquer sur le lien pour vérifier votre email auprés du club de jeu Les gardiens de la légende. ${link}`, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
-          html: emailheaderVerify +`
+          html: emailheaderVerify + `
             <h3>Bonjour <span class="username"> ${userInDb.firstName} ${userInDb.lastName}, </span> </h3> <br>
             <p>Vous souhaitez vous inscrire au club de jeux <h4> Les gardiens de la legende.</h4></p> <br> 
             <p>Merci de cliquer sur le lien pour vérifier votre email auprés du club de jeu Les gardiens de la légende. </p> <br>
-            <a href="${link}">cliquez ici pour vérifier votre email. </a> <br>`+ emailfooterVerify,
+            <a href="${link}">cliquez ici pour vérifier votre email. </a> <br>` + emailfooterVerify,
         });
 
         console.log("Message sent: %s", info.messageId);
@@ -698,7 +713,7 @@ const userController = {
   new_pwd: async (req, res) => {
 
     try {
-console.log('coucou du controller');
+
       const email = req.sanitize(req.body.emailAddress);
 
       console.log("email =>", email);
@@ -752,7 +767,7 @@ console.log('coucou du controller');
 
         const host = req.get('host');
 
-        const link = `http://${host}/v1/user/new_pwd?userId=${userInDb.id}&token=${newToken}`;
+        const link = `https://${host}/v1/user/reset_pwd?userId=${userInDb.id}&token=${newToken}`;
         console.log("ici link vaut => ", link);
         console.log("newToken => ", newToken);
 
@@ -772,10 +787,10 @@ console.log('coucou du controller');
           to: `${userInDb.emailAddress}`, // le ou les receveurs => `${request.body.emailAddress}`
           subject: `Les gardiens de la légende : Changement de votre mot de passe`, // le sujet du mail
           text: `Bonjour ${userInDb.firstName} ${userInDb.lastName}, merci de cliquer sur le lien pour vérifier votre email auprés du club de jeu Les gardiens de la légende. ${link}`, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
-          html: emailheaderVerify+`<h3>Bonjour <span class="username"> ${userInDb.firstName} ${userInDb.lastName}, </span> </h3> <br>
+          html: emailheaderVerify + `<h3>Bonjour <span class="username"> ${userInDb.firstName} ${userInDb.lastName}, </span> </h3> <br>
               <p>Vous souhaitez réinitialiser votre mot de passe au club de jeux Les gardiens de la legende.</p> <br> 
               <p>Merci de cliquer sur le lien pour changer votre mot de passe. </p> <br>
-              <a href="${link}">cliquez ici pour changer votre mot de passe. </a><br>`+emailfooterVerify,
+              <a href="${link}">cliquez ici pour changer votre mot de passe. </a><br>` + emailfooterVerify,
         });
 
         console.log("Message sent: %s", info.messageId);
@@ -884,8 +899,14 @@ console.log('coucou du controller');
         console.log("id =>", id);
         console.log("password => ", password);
 
+        const newUser={
+          id,
+          password,
+        };
 
-        await User.updatePwd(password, id);
+        const userUpdatePasssword = new User(newUser);
+        await userUpdatePasssword.updatePwd();
+
 
         // j'en profite pour rappeler a l'utilisateur de vérifier son email pour se connecter
         if (!userInDb.verifyemail) {
@@ -933,8 +954,8 @@ console.log('coucou du controller');
             from: 'lesgardiensdelalegende@gmail.com', //l'envoyeur
             to: `${userInDb.emailAddress}`, // le ou les receveurs => `${newUser.emailAddress}`
             subject: `Vos modification d'information sur le site des Gardiens de la légende à été pris en compte ! ✔`, // le sujet du mail
-            text: `Bonjour ${userInDb.firstName} ${userInDb.lastName},`+emailTextUpdateNewPassword, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
-            html: emailheaderVerify+`<h3>Bonjour <span class="username"> ${userInDb.firstName} ${userInDb.lastName}, </span> </h3> <br>`+emailFooterNewPassword, // le contenu du mail en format html.
+            text: `Bonjour ${userInDb.firstName} ${userInDb.lastName},` + emailTextUpdateNewPassword, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
+            html: emailheaderVerify + `<h3>Bonjour <span class="username"> ${userInDb.firstName} ${userInDb.lastName}, </span> </h3> <br>` + emailFooterNewPassword, // le contenu du mail en format html.
           });
 
           console.log("Message sent: %s", info.messageId);
@@ -950,7 +971,7 @@ console.log('coucou du controller');
 
     } catch (error) {
       console.trace(
-        'Erreur dans la méthode verifyEmail du userController :',
+        'Erreur dans la méthode reset_pwd du userController :',
         error);
       res.status(500).json(error.message);
     }

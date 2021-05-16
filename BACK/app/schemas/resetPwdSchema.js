@@ -27,16 +27,16 @@ const Joi = require('joi');
      'string.pattern.base':' Le format de votre pseudo est incorrect : il doit contenir au minimum 3 caractéres et ne pas être composé d\'espaces !',
      'string.alphanum': 'Votre pseudo ne doit contenir que des caractéres alpha-numériques',
    }),
-   password: Joi.string()
+   newPassword: Joi.string()
      .pattern(new RegExp(/^(?=.*[\d])(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*])[\w!@#$%^&*]{8,}$/))
      .required()
      .messages({
       'string.empty': `Le champs de votre password ne peut être vide !`,
       'string.pattern.base':'Le format de votre mot de passe est incorrect : Il doit contenir au minimum 8 caractéres avec minimum, un chiffre, une lettre majuscule, une lettre minuscule et un carctére spécial parmis : ! @ # $% ^ & * ',
      }),
-     passwordConfirm: Joi.ref('password'),
+     passwordConfirm: Joi.ref('newPassword'),
 
 
-}).with('password', 'passwordConfirm');
+}).with('newPassword', 'passwordConfirm');
 
  module.exports = resetPwdSchema;
