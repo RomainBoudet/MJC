@@ -98,6 +98,13 @@ app.use(helmet());
     upgradeInsecureRequests: [] // On convertit tout ce qui rentre en HTTP et HTTPS direct !
   }
 }))
+//j'autorise la prélecture DNS pour ganer du temps sur mobile.. => https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control
+app.use(
+  helmet.dnsPrefetchControl({
+    allow: true,
+  })
+);
+
 // ATTENTION cette protection contre les reflextive XSS pourrait être la porte ouverte pour les attaques XS search.. :
 //https://infosecwriteups.com/xss-auditor-the-protector-of-unprotected-f900a5e15b7b
 //https://portswigger.net/research/top-10-web-hacking-techniques-of-2019
