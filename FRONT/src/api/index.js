@@ -7,7 +7,7 @@ export default axios.create({
 */
 
 export default axios.create({
-  baseURL: 'https://localhost:3000/v1/',
+  baseURL: 'https://localhost:4000/v1/',
   timeout: 10000,
   withCredentials: true,
 });

@@ -698,7 +698,7 @@ const userController = {
   new_pwd: async (req, res) => {
 
     try {
-
+console.log('coucou du controller');
       const email = req.sanitize(req.body.emailAddress);
 
       console.log("email =>", email);
