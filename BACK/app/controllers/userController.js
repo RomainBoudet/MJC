@@ -612,7 +612,7 @@ const userController = {
 
     try {
 
-      const email = req.sanitize(req.body.email);
+      const email = req.sanitize(req.body.emailAddress);
 
       console.log("email =>", email);
       //on ne recherche que l'email avec un format valide. Triple sécurité contre les tentatives d'injection de script (faille xss), Joi avec sa REGEX, express sanitize et email validator.

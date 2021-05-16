@@ -102,7 +102,7 @@ export default (store) => (next) => async (action) => {
           },
         };
         await axios.post('/resendEmailLink', {
-          email: newEmail
+          emailAddress: newEmail
         }, options);
       } catch (error) {
         console.log('error', error);

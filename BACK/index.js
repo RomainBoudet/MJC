@@ -95,13 +95,23 @@ app.use(helmet());
     imgSrc: [`self`,`filedn.eu`], //je configure helmet pour la CSP : ok pour aller chercher mes images sur mon cloud perso, tout le reste, ça dégage !
     //styleSrc: [ `self`,"'unsafe-inline'""] // ça s'était avant d'utiliser l'attribut nonce ! A bannir pour une CSP efficace... c'est pourquoi j'utilise uuid
     styleSrc: [ (_, res) => `'nonce-${ res.locals.nonce }'`], // je peux utiliser res ici je suis dans un app.use ! Je convertis dynamiquement le nonce de ma vue avec cette méthode, sans avoir besoin de mettre 'unsafe-inline' pour lire CSS de ma vue, ce qui affaiblirait considérablement ma CSP ! 
-    upgradeInsecureRequests: [] // On convertit tout ce qui rentre en HTTP et HTTPS direct !
-  }
+    upgradeInsecureRequests: [], // On convertit tout ce qui rentre en HTTP et HTTPS direct !
+    //reportUri: `/api/csp/report`, ==>> a prévoir une url pour l'admin pour savoir quelle ressource ont été bloqué par ma CSP ! et a loggé avec Winston aussi
+  },
+  //reportOnly: true
 }))
 //j'autorise la prélecture DNS pour ganer du temps sur mobile.. => https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control
 app.use(
   helmet.dnsPrefetchControl({
     allow: true,
+  })
+);
+//demander qu'un navigateur applique toujours l'exigence de transparence du certificat SSL !
+app.use(
+  helmet.expectCt({
+    maxAge:0,
+    enforce: true,
+    //reportUri: "https://example.com/report", Pourrait être intérresant de se prévoir une url pour l'admin avec aussi 
   })
 );
 
