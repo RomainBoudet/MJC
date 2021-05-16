@@ -1,12 +1,14 @@
 // je require les info de connexion qui sont dans un point env précis en passant en argument la localisation du .env.back 
-require('dotenv').config({ path: `${__dirname}/.env.back` });
+require('dotenv').config({
+  path: `${__dirname}/.env.back`
+});
 
 // on récupére ce dont on a besoin pour monter un seveur https
 const fs = require('fs');
 //parce que c'est beau la couleur ;)
-const chalk = require ('chalk');
+const chalk = require('chalk');
 //Mise en place d'un logger pour garder une trace écrite des connexion
-const logger = require ('./app/services/logger');
+const logger = require('./app/services/logger');
 
 // on require les modules nécéssaire : 
 const cors = require('cors');
@@ -64,13 +66,15 @@ app.use(expressSanitizer());
 app.use(logger);
 
 // le parser JSON qui récupère le payload quand il y en a un et le transforme en objet JS disponible sous request.body
-app.use(express.json()); 
+app.use(express.json());
 
 //cookie parser, qui me permet d'avoir accés a req.cookies dans mes MW auth, admin et moderateur
 app.use(cookieParser(process.env.SECRET));
 
 // on va devoir gérer des données en POST, on ajoute le middleware urlencoded pour récupérer les infos dans request.body 
-app.use(express.urlencoded({extended: true})); 
+app.use(express.urlencoded({
+  extended: true
+}));
 
 // je récupére un uuid que je vais passer a l'objet locals pour le récupérer dans a vue, et au passage le faire changer dans mas CSP égalemnt de maniére dynamique
 // Même si uuid n'a pas de dépendance...a voir si j'ai intéret a le remplacer par crypto.randomBytes() ... ?
@@ -88,29 +92,28 @@ app.use((req, res, next) => {
 // CSP ==> Késséssé ? : https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP 
 app.use(helmet());
 
-//je dois configurer la CSP pour autoriser mon serveur a utiliser du CSS et mes images cloud pour le rendu de la validation du mail
- app.use(helmet.contentSecurityPolicy({
-  directives: {
-    defaultSrc: [`'self'`], // le fallback, pas présent par défault, 
-    imgSrc: [`self`,`filedn.eu`], //je configure helmet pour la CSP : ok pour aller chercher mes images sur mon cloud perso, tout le reste, ça dégage !
-    //styleSrc: [ `self`,"'unsafe-inline'""] // ça s'était avant d'utiliser l'attribut nonce ! A bannir pour une CSP efficace... c'est pourquoi j'utilise uuid
-    styleSrc: [ (_, res) => `'nonce-${ res.locals.nonce }'`], // je peux utiliser res ici je suis dans un app.use ! Je convertis dynamiquement le nonce de ma vue avec cette méthode, sans avoir besoin de mettre 'unsafe-inline' pour lire CSS de ma vue, ce qui affaiblirait considérablement ma CSP ! 
-    upgradeInsecureRequests: [], // On convertit tout ce qui rentre en HTTP et HTTPS direct !
-    //reportUri: `/api/csp/report`, ==>> a prévoir une url pour l'admin pour savoir quelle ressource ont été bloqué par ma CSP ! et a loggé avec Winston aussi
-  },
-  //reportOnly: true
-}))
-//j'autorise la prélecture DNS pour ganer du temps sur mobile.. => https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control
-app.use(
+// configuration de nos header !
+app.use(helmet.contentSecurityPolicy({
+    directives: {//je dois configurer la CSP pour autoriser mon serveur a utiliser du CSS et mes images cloud pour le rendu de la validation du mail
+      defaultSrc: [`'self'`], // le fallback, pas présent par défault, 
+      imgSrc: [`self`, `filedn.eu`], //je configure helmet pour la CSP : ok pour aller chercher mes images sur mon cloud perso, tout le reste, ça dégage !
+      //styleSrc: [ `self`,"'unsafe-inline'""] // ça s'était avant d'utiliser l'attribut nonce ! A bannir pour une CSP efficace... c'est pourquoi j'utilise uuid
+      styleSrc: [(_, res) => `'nonce-${ res.locals.nonce }'`], // je peux utiliser res ici je suis dans un app.use ! Je convertis dynamiquement le nonce de ma vue avec cette méthode, sans avoir besoin de mettre 'unsafe-inline' pour lire CSS de ma vue, ce qui affaiblirait considérablement ma CSP ! 
+      upgradeInsecureRequests: [], // On convertit tout ce qui rentre en HTTP et HTTPS direct !
+      //reportUri: `/api/csp/report`, ==>> a prévoir une url pour l'admin pour savoir quelle ressource ont été bloqué par ma CSP ! et a loggé avec Winston aussi
+    },
+    //reportOnly: true
+  }),
   helmet.dnsPrefetchControl({
-    allow: true,
+    allow: true, //j'autorise la prélecture DNS pour ganer du temps sur mobile.. => https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control
   }),
   helmet.expectCt({
-    maxAge:0,
-    enforce: true,//demander qu'un navigateur applique toujours l'exigence de transparence du certificat SSL !
+    maxAge: 0,
+    enforce: true, //demander qu'un navigateur applique toujours l'exigence de transparence du certificat SSL !
     //reportUri: "https://example.com/report", Pourrait être intérresant de se prévoir une url pour l'admin avec aussi 
-  })
-);
+  }))
+
+
 
 
 // ATTENTION cette protection contre les reflextive XSS pourrait être la porte ouverte pour les attaques XS search.. :
@@ -128,7 +131,9 @@ app.use((req, res, next) => {
 //mise en place du système de sessions pour stocker les infos utilisateur // https://www.npmjs.com/package/express-session
 app.use(
   session({
-    store: new RedisStore({ client: redisClient }), // et nos cookies sont stockés sur REDIS !
+    store: new RedisStore({
+      client: redisClient
+    }), // et nos cookies sont stockés sur REDIS !
     resave: true, // Resauver la session à chaque requête -> pour prolonger la durée de vie
     saveUninitialized: true, // Permet de sauver automatiquement la session d'un visiteur sans que j'ai à l'intialiser moi-même
     secret: process.env.SECRET, // le .env est dans la variable SECRET du .env.back
@@ -136,7 +141,7 @@ app.use(
       secure: true, //si true, la navigateur n'envoit que des cookie sur du HTTPS
       maxAge: 1000 * 60 * 60 * 24 * 15, // ça fait une heure * 24h * 15 jours
       httpOnly: true, // Garantit que le cookie n’est envoyé que sur HTTP(S), pas au JavaScript du client, ce qui renforce la protection contre les attaques de type cross-site scripting.
-      sameSite: 'strict',       //le mode Strict empêche l’envoi d’un cookie de session dans le cas d’un accès au site via un lien externe//https://blog.dareboost.com/fr/2017/06/securisation-cookies-attribut-samesite/
+      sameSite: 'strict', //le mode Strict empêche l’envoi d’un cookie de session dans le cas d’un accès au site via un lien externe//https://blog.dareboost.com/fr/2017/06/securisation-cookies-attribut-samesite/
       //!il faudra définir les options de sécurité pour accroitre la sécurité. (https://expressjs.com/fr/advanced/best-practice-security.html)
       //domain: 'example.com',  Indique le domaine du cookie ; utilisez cette option pour une comparaison avec le domaine du serveur dans lequel l’URL est demandée. S’ils correspondent, vérifiez ensuite l’attribut de chemin.
       //path: 'foo/bar', Indique le chemin du cookie ; utilisez cette option pour une comparaison avec le chemin demandé. Si le chemin et le domaine correspondent, envoyez le cookie dans la demande.
@@ -147,14 +152,14 @@ app.use(
 
 // Je require le middleware pour dire à express d'être plus permissif sur l'origine des requête
 
-    app.use(cors({
+app.use(cors({
   optionsSuccessStatus: 200,
   credentials: true, // pour envoyer des cookies et des en-têtes d'autorisations faut rajouter une autorisation avec l'option credential
-  origin:'https://localhost:8080', // true = req.header('Origin') //! a pas oublier pour la prod ! => remplacer par le bon nom de domaine
+  origin: 'https://localhost:8080', // true = req.header('Origin') //! a pas oublier pour la prod ! => remplacer par le bon nom de domaine
   methods: "GET, PUT, PATCH, POST, DELETE", // ok via un array aussi
-  allowedHeaders : ['Content-Type', 'x-xsrf-token'],
-})); 
- 
+  allowedHeaders: ['Content-Type', 'x-xsrf-token'],
+}));
+
 //FIN DES MIDDLEWARES----------------------------------------------------------------------
 
 // on préfixe notre router avec un V1 qui sera inclus devant chaque nom de route. Permet de faire évoluer l'app avec une V2 plus facilement.
@@ -170,9 +175,12 @@ const cert = fs.readFileSync(process.env.SSL_CRT_FILE);
 // la création d'une clé ssl et d'un certificat prend un peu de temps a comprendre (enfin pour ma part), mais vous retrouverez de la doc dans le fichier.txt du dossier certificat
 
 // les options que l'on va passer pour la config du https.
-const options = { key, cert };
+const options = {
+  key,
+  cert
+};
 
 /* Puis on créer notre serveur HTTPS SPEEDY avec les option qui sont le certificat et la clé */
 spdy.createServer(options, app).listen(port, () => {
-  console.log(chalk.cyan`API Back jeux de société Running on`,chalk.magenta.bold.inverse`https`,chalk.cyan`://localhost:${port}`);
+  console.log(chalk.cyan `API Back jeux de société Running on`, chalk.magenta.bold.inverse `https`, chalk.cyan `://localhost:${port}`);
 });
