@@ -5,7 +5,7 @@
  * db est un pool de connecteurs de base de données
  * @module - permet le lien avec la base de données postgreSQL
  */
-const { Pool, Connection } = require('pg');
+const { Pool } = require('pg');
 
 // ici, les informations de connection sont récupérées dans l'environnement
 // PGHOST pour l'hôte
