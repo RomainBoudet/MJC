@@ -17,6 +17,7 @@ const redisSession = require('redis');
 const helmet = require('helmet');
 const router = require('./app/router');
 const cookieParser = require("cookie-parser");
+const uuid = require(`uuid`)
 
 //passage de notre api en https2 ! l'API des champions !
 // et Jamy, c'est quoi du http2 ? => https://http2.github.io/faq/  => https://fr.wikipedia.org/wiki/SPDY 
@@ -70,7 +71,13 @@ app.use(cookieParser(process.env.SECRET));
 
 // on va devoir gérer des données en POST, on ajoute le middleware urlencoded pour récupérer les infos dans request.body 
 app.use(express.urlencoded({extended: true})); 
- 
+
+// je récupére un uuid que je vais passer a l'objet locals pour le récupérer dans a vue, et au passage le faire changer dans mas CSP égalemnt de maniére dynamique
+// Même si uuid n'a pas de dépendance...a voir si j'ai intéret a le remplacer par crypto.randomBytes() ... ?
+app.use((req, res, next) => {
+  res.locals.nonce = uuid.v4()
+  next()
+})
 
 //helmet : une collection de neuf fonctions middleware qui définissent des en-têtes HTTP liés à la sécurité, protége nottament du reniflage du code MIME et du clicjacking. Fonctions d'helmet que l'on peut trouver sur le lien suivant..
 //helmet : https://expressjs.com/fr/advanced/best-practice-security.html 
@@ -84,11 +91,23 @@ app.use(helmet());
 //je dois configurer la CSP pour autoriser mon serveur a utiliser du CSS et mes images cloud pour le rendu de la validation du mail
  app.use(helmet.contentSecurityPolicy({
   directives: {
-    defaultSrc: [`'self'`],
+    defaultSrc: [`'self'`], // le fallback, pas présent par défault, 
     imgSrc: [`self`,`filedn.eu`], //je configure helmet pour la CSP : ok pour aller chercher mes images sur mon cloud perso, tout le reste, ça dégage !
-    styleSrc: [`self`, "'unsafe-inline'" ] // ok pour utiliser le inline CSS de ma view 
+    //styleSrc: [ `self`,"'unsafe-inline'""] // ça s'était avant d'utiliser l'attribut nonce ! A bannir pour une CSP efficace... c'est pourquoi j'utilise uuid
+    styleSrc: [ (_, res) => `'nonce-${ res.locals.nonce }'`], // je peux utiliser res ici je suis dans un app.use ! Je convertis dynamiquement le nonce de ma vue avec cette méthode, sans avoir besoin de mettre 'unsafe-inline' pour lire CSS de ma vue, ce qui affaiblirait considérablement ma CSP ! 
+    upgradeInsecureRequests: [] // On convertit tout ce qui rentre en HTTP et HTTPS direct !
   }
 }))
+// ATTENTION cette protection contre les reflextive XSS pourrait être la porte ouverte pour les attaques XS search.. :
+//https://infosecwriteups.com/xss-auditor-the-protector-of-unprotected-f900a5e15b7b
+//https://portswigger.net/research/top-10-web-hacking-techniques-of-2019
+//https://github.com/xsleaks/xsleaks/wiki/Browser-Side-Channels
+// risque de XS leak important, des attaquant peuvent soutirer des infos en provoquant des faux postive, l'API XSS filter étant sensible a ce type d'attaque..
+// cette option override celle de helmet qui la méttait a 0
+app.use((req, res, next) => {
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  next();
+});
 
 
 //mise en place du système de sessions pour stocker les infos utilisateur // https://www.npmjs.com/package/express-session
@@ -102,9 +121,8 @@ app.use(
       secure: true, //si true, la navigateur n'envoit que des cookie sur du HTTPS
       maxAge: 1000 * 60 * 60 * 24 * 15, // ça fait une heure * 24h * 15 jours
       httpOnly: true, // Garantit que le cookie n’est envoyé que sur HTTP(S), pas au JavaScript du client, ce qui renforce la protection contre les attaques de type cross-site scripting.
-      sameSite: 'strict',
+      sameSite: 'strict',       //le mode Strict empêche l’envoi d’un cookie de session dans le cas d’un accès au site via un lien externe//https://blog.dareboost.com/fr/2017/06/securisation-cookies-attribut-samesite/
       //!il faudra définir les options de sécurité pour accroitre la sécurité. (https://expressjs.com/fr/advanced/best-practice-security.html)
-      //le mode Strict empêche l’envoi d’un cookie de session dans le cas d’un accès au site via un lien externe//https://blog.dareboost.com/fr/2017/06/securisation-cookies-attribut-samesite/
       //domain: 'example.com',  Indique le domaine du cookie ; utilisez cette option pour une comparaison avec le domaine du serveur dans lequel l’URL est demandée. S’ils correspondent, vérifiez ensuite l’attribut de chemin.
       //path: 'foo/bar', Indique le chemin du cookie ; utilisez cette option pour une comparaison avec le chemin demandé. Si le chemin et le domaine correspondent, envoyez le cookie dans la demande.
       //expires: expiryDate, Utilisez cette option pour définir la date d’expiration des cookies persistants.

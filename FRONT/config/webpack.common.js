@@ -2,6 +2,7 @@ const paths = require('./paths');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const SriPlugin = require('webpack-subresource-integrity');
 
 module.exports = {
   entry: [
@@ -14,6 +15,7 @@ module.exports = {
     path: paths.build,
     publicPath: '/',
     filename: 'js/[name].[contenthash].js',
+    crossOriginLoading: 'anonymous',
   },
   resolve: {
     alias: {
@@ -36,6 +38,13 @@ module.exports = {
       favicon: paths.assets + '/favicon.ico',
       template: paths.assets + '/index.html',
     }),
+
+    // le plugin ci dessous est a supprimer en cas de probléme de hot reloading // 
+    //il vérifit que les CDN envoyé ne sont pas corrompus https://developer.mozilla.org/fr/docs/Web/Security/Subresource_Integrity 
+    new SriPlugin({
+      hashFuncNames: ['sha256', 'sha384'],
+      enabled: true,
+  }),
   ],
 
   module: {

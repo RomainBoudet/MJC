@@ -7,6 +7,8 @@ const jsonwebtoken = require('jsonwebtoken');
 const {
   message
 } = require('../schemas/userLoginSchema');
+const {emailheaderVerify, emailfooterVerify, emailfooterUpdate, emailTextUpdate, emailTextUpdateNewEmail, emailFooterUpdateNewEmail, emailTextUpdateNewPassword, emailFooterNewPassword} = require('../email/html')
+
 
 /**
  * Une variable d'environnement qui est présent dans le .env.back contenant la clé secréte utiisé pour générer le token
@@ -251,70 +253,10 @@ const userController = {
           to: `${userNowInDb.emailAddress}`, // le ou les receveurs => `${request.body.emailAddress}`
           subject: `Les gardiens de la légende : merci de confirmer votre email`, // le sujet du mail
           text: `Bonjour ${userNowInDb.firstName} ${userNowInDb.lastName}, merci de cliquer sur le lien pour vérifier votre email auprés du club de jeu Les gardiens de la légende.`, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
-          html: `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"
-          integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw=="
-          crossorigin="anonymous" />
-      <style>
-      h3 {
-        font-size: 1.5rem;
-    }
-
-    body {
-        background-color: rgb(253, 232, 175);
-    }
-
-    .background {
-        display: flex
-    }
-
-    .medieval {
-        border-radius: 8px;
-        max-height: 500px;
-        height: 300px;
-        width: 1500px;
-        max-width: 100%;
-    }
-    .logo {
-        border-radius: 8px;
-        max-height: 300px;
-        max-width: 300px;
-        width: 2500px;
-        height: 250px;
-        padding: 1rem;
-        position: absolute;
-        left: 800px;
-        top: 10px;
-    }
-    .montext {
-        padding: 2rem 0 0 2rem;
-    }
-    a { 
-      padding: 1rem 0 0 0;
-    }
-      </style>
-      <body>
-          <div class="background">
-      
-              <a href="http://localhost:8080"> <img class="medieval"
-                      src="https://eapi.pcloud.com/getpubthumb?code=XZlztkZqnIb2V9qFI4z3M5DI9gDBQIu0TfX&linkpassword=undefined&size=870x217&crop=0&type=auto"
-                      alt="medieval"> </a>
-      
-              <div><a href="http://localhost:8080"> <img class="logo"
-                          src="https://eapi.pcloud.com/getpubthumb?code=XZoUikZEo78U2gRx1yXF1P6sMJqSVwjXvt7&linkpassword=undefined&size=1024x937&crop=0&type=auto"
-                          alt="logo les gardiens de la légendes"> </a></div>
-          </div>
-      
-          <div class="montext">
-              <h3>Bonjour <span class="username"> ${userNowInDb.firstName} ${userNowInDb.lastName}, </span> </h3> <br>
+          html: emailheaderVerify+`<h3>Bonjour <span class="username"> ${userNowInDb.firstName} ${userNowInDb.lastName}, </span> </h3> <br>
               <p>Vous souhaitez vous inscrire au club de jeux des gardiens de la legende.</p> <br> 
               <p>Merci de cliquer sur le lien pour vérifier votre email auprés du club de jeu Les gardiens de la légende. </p> <br>
-              <a href="${link}">cliquez ici pour vérifier votre email. </a> <br>
-              <p>L'administrateur du site Les gardiens de la légende.</p> <br>
-              <a href="http://localhost:8080"> Les gardiens de la légendes</a>
-      
-          </div>
-      
-      </body>`,
+              <a href="${link}">cliquez ici pour vérifier votre email. </a> <br>` + emailfooterVerify,
         });
 
         console.log("Message sent: %s", info.messageId);
@@ -514,78 +456,8 @@ const userController = {
           from: 'lesgardiensdelalegende@gmail.com', //l'envoyeur
           to: `${newUser.emailAddress}`, // le ou les receveurs => `${newUser.emailAddress}`
           subject: `Vos modification d'information sur le site des Gardiens de la légende à été pris en compte ! ✔`, // le sujet du mail
-          text: `Bonjour ${newUser.firstName} ${newUser.lastName},
-          Vous êtes membre du club de jeux des gardiens de la legendes.
-          Vous avez récemment changé vos informations personnelles dans la configuration de votre compte. 😊 
-          Vos changement ont bien été pris en compte ! ✔️
-          En vous remerciant et en espérant vous revoir bientôt autour d'un jeu ! 🤗
-          Bonne journée.
-          L'administrateur du site Les gardiens de la légende.`, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
-          html: `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"
-          integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw=="
-          crossorigin="anonymous" />
-      <style>
-      h3 {
-        font-size: 1.5rem;
-    }
-
-    body {
-        background-color: rgb(253, 232, 175);
-    }
-
-    .background {
-        display: flex
-    }
-
-    .medieval {
-        border-radius: 8px;
-        max-height: 500px;
-        height: 300px;
-        width: 1500px;
-        max-width: 100%;
-    }
-    .logo {
-        border-radius: 8px;
-        max-height: 300px;
-        max-width: 300px;
-        width: 2500px;
-        height: 250px;
-        padding: 1rem;
-        position: absolute;
-        left: 800px;
-        top: 10px;
-    }
-    .montext {
-        padding: 2rem 0 0 2rem;
-    }
-      </style>
-      <body>
-          <div class="background">
-      
-              <a href="http://localhost:8080"> <img class="medieval"
-                      src="https://eapi.pcloud.com/getpubthumb?code=XZlztkZqnIb2V9qFI4z3M5DI9gDBQIu0TfX&linkpassword=undefined&size=870x217&crop=0&type=auto"
-                      alt="medieval"> </a>
-      
-              <div><a href="http://localhost:8080"> <img class="logo"
-                          src="https://eapi.pcloud.com/getpubthumb?code=XZoUikZEo78U2gRx1yXF1P6sMJqSVwjXvt7&linkpassword=undefined&size=1024x937&crop=0&type=auto"
-                          alt="logo les gardiens de la légendes"> </a></div>
-          </div>
-      
-          <div class="montext">
-              <h3>Bonjour <span class="username"> ${newUser.firstName} ${newUser.lastName}, </span> </h3> <br>
-              <p>Vous êtes membre du club de jeux des gardiens de la legendes.</p>
-              <p>Vous avez récemment changé vos informations personnelles dans la configuration de votre compte. 😊 </p>
-              <p> Vos changement ont bien été pris en compte ! ✔️ </p> <br>
-              
-              <p>En vous remerciant et en espérant vous revoir bientôt autour d'un jeu ! 🤗</p>
-              <p> Bonne journée.</p> <br>
-      
-              <p>L'administrateur du site Les gardiens de la légende.</p> <br>
-              <a href="http://localhost:8080"> Les gardiens de la légendes</a>
-      
-          </div>
-      
-      </body>`, // le contenu du mail en format html.
+          text: `Bonjour ${newUser.firstName} ${newUser.lastName},`+emailTextUpdate, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
+          html: emailheaderVerify+`<h3>Bonjour <span class="username"> ${newUser.firstName} ${newUser.lastName}, </span> </h3> <br>`+emailfooterUpdate, // le contenu du mail en format html.
         });
 
         console.log("Message sent: %s", info.messageId);
@@ -624,81 +496,8 @@ const userController = {
             from: 'lesgardiensdelalegende@gmail.com', //l'envoyeur
             to: `${userIdinDb.emailAddress}`, // ici le receveur est l'ancien mail donné par le user
             subject: `Vos modification d'information sur le site des Gardiens de la légende à été pris en compte ! ✔`, // le sujet du mail
-            text: `Bonjour ${newUser.firstName} ${newUser.lastName},
-          Vous êtes membre du club de jeux des gardiens de la legendes.
-          Vous avez récemment changé vos informations personnelles dans la configuration de votre compte. 😊 
-          Vos changement ont bien été pris en compte ! ✔️
-          Vous avez changé d'adresse email, Ce sera le dernier email sur cette adresse.
-          Une notification vous a également été envoyé sur votre nouvel email.
-          En vous remerciant et en espérant vous revoir bientôt autour d'un jeu ! 🤗
-          Bonne journée.
-          L'administrateur du site Les gardiens de la légende.`, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
-            html: `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"
-          integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw=="
-          crossorigin="anonymous" />
-      <style>
-      h3 {
-        font-size: 1.5rem;
-    }
-
-    body {
-        background-color: rgb(253, 232, 175);
-    }
-
-    .background {
-        display: flex
-    }
-
-    .medieval {
-        border-radius: 8px;
-        max-height: 500px;
-        height: 300px;
-        width: 1500px;
-        max-width: 100%;
-    }
-    .logo {
-        border-radius: 8px;
-        max-height: 300px;
-        max-width: 300px;
-        width: 2500px;
-        height: 250px;
-        padding: 1rem;
-        position: absolute;
-        left: 800px;
-        top: 10px;
-    }
-    .montext {
-        padding: 2rem 0 0 2rem;
-    }
-      </style>
-      <body>
-          <div class="background">
-      
-              <a href="http://localhost:8080"> <img class="medieval"
-                      src="https://eapi.pcloud.com/getpubthumb?code=XZlztkZqnIb2V9qFI4z3M5DI9gDBQIu0TfX&linkpassword=undefined&size=870x217&crop=0&type=auto"
-                      alt="medieval"> </a>
-      
-              <div><a href="http://localhost:8080"> <img class="logo"
-                          src="https://eapi.pcloud.com/getpubthumb?code=XZoUikZEo78U2gRx1yXF1P6sMJqSVwjXvt7&linkpassword=undefined&size=1024x937&crop=0&type=auto"
-                          alt="logo les gardiens de la légendes"> </a></div>
-          </div>
-      
-          <div class="montext">
-              <h3>Bonjour <span class="username"> ${newUser.firstName} ${newUser.lastName}, </span> </h3> <br>
-              <p>Vous êtes membre du club de jeux des gardiens de la legendes.</p>
-              <p>Vous avez récemment changé vos informations personnelles dans la configuration de votre compte. 😊 </p>
-              <p> Vos changement ont bien été pris en compte ! ✔️ </p> <br>
-              <p>Vous avez changé d'adresse email, Ce sera le dernier email sur cette adresse.</p> <br>
-              <p>Une notification vous a également été envoyé sur votre nouvel email.</p> <br>
-              <p>En vous remerciant et en espérant vous revoir bientôt autour d'un jeu ! 🤗</p>
-              <p> Bonne journée.</p> <br>
-      
-              <p>L'administrateur du site Les gardiens de la légende.</p> <br>
-              <a href="http://localhost:8080"> Les gardiens de la légendes</a>
-      
-          </div>
-      
-      </body>`, // le contenu du mail en format html.
+            text: `Bonjour ${newUser.firstName} ${newUser.lastName},`+emailTextUpdateNewEmail, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
+            html: emailheaderVerify+`<h3>Bonjour <span class="username"> ${newUser.firstName} ${newUser.lastName}, </span> </h3> <br>`+emailFooterUpdateNewEmail, // le contenu du mail en format html.
           });
 
           console.log("Message sent: %s", info.messageId);
@@ -842,7 +641,6 @@ const userController = {
       const newToken = await jsonwebtoken.sign(jwtContent, jwtSecret, jwtOptions);
 
       async function main() {
-
         const host = req.get('host');
         const link = `https://${host}/v1/verifyEmail?userId=${userInDb.id}&token=${newToken}`;
         console.log("ici host vaut =>", host);
@@ -865,70 +663,12 @@ const userController = {
           from: 'lesgardiensdelalegende@gmail.com', //l'envoyeur
           to: `${userInDb.emailAddress}`, // le ou les receveurs => `${request.body.emailAddress}`
           subject: `Merci de confirmer votre email`, // le sujet du mail
-          text: `Bonjour ${userInDb.firstName} ${userInDb.lastName}, merci de cliquer sur le lien pour vérifier votre email auprés du club de jeu Les gardiens de la légende.`, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
-          html: `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"
-        integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw=="
-        crossorigin="anonymous" />
-    <style>
-    h3 {
-      font-size: 1.5rem;
-  }
-
-  body {
-      background-color: rgb(253, 232, 175);
-  }
-
-  .background {
-      display: flex
-  }
-
-  .medieval {
-      border-radius: 8px;
-      max-height: 500px;
-      height: 300px;
-      width: 1500px;
-      max-width: 100%;
-  }
-  .logo {
-      border-radius: 8px;
-      max-height: 300px;
-      max-width: 300px;
-      width: 2500px;
-      height: 250px;
-      padding: 1rem;
-      position: absolute;
-      left: 800px;
-      top: 10px;
-  }
-  .montext {
-      padding: 2rem 0 0 2rem;
-  }
-  a { 
-    padding: 1rem 0 0 0;
-    </style>
-    <body>
-        <div class="background">
-    
-            <a href="http://localhost:8080"> <img class="medieval"
-                    src="https://eapi.pcloud.com/getpubthumb?code=XZlztkZqnIb2V9qFI4z3M5DI9gDBQIu0TfX&linkpassword=undefined&size=870x217&crop=0&type=auto"
-                    alt="medieval"> </a>
-    
-            <div><a href="http://localhost:8080"> <img class="logo"
-                        src="https://eapi.pcloud.com/getpubthumb?code=XZoUikZEo78U2gRx1yXF1P6sMJqSVwjXvt7&linkpassword=undefined&size=1024x937&crop=0&type=auto"
-                        alt="logo les gardiens de la légendes"> </a></div>
-        </div>
-    
-        <div class="montext">
+          text: `Bonjour ${userInDb.firstName} ${userInDb.lastName}, merci de cliquer sur le lien pour vérifier votre email auprés du club de jeu Les gardiens de la légende. ${link}`, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
+          html: emailheaderVerify +`
             <h3>Bonjour <span class="username"> ${userInDb.firstName} ${userInDb.lastName}, </span> </h3> <br>
-            <p>Vous souhaitez vous inscrire au club de jeux <h4> Les gardiens de la legende</h4>.</p> <br> 
+            <p>Vous souhaitez vous inscrire au club de jeux <h4> Les gardiens de la legende.</h4></p> <br> 
             <p>Merci de cliquer sur le lien pour vérifier votre email auprés du club de jeu Les gardiens de la légende. </p> <br>
-            <a href="${link}">cliquez ici pour vérifier votre email. </a> <br>
-            <br> <p>L'administrateur du site Les gardiens de la légende.</p> <br>
-            <br> <a href="http://localhost:8080"> Les gardiens de la légendes</a> <br>
-    
-        </div>
-    
-    </body>`,
+            <a href="${link}">cliquez ici pour vérifier votre email. </a> <br>`+ emailfooterVerify,
         });
 
         console.log("Message sent: %s", info.messageId);
@@ -1031,71 +771,11 @@ const userController = {
           from: 'lesgardiensdelalegende@gmail.com', //l'envoyeur
           to: `${userInDb.emailAddress}`, // le ou les receveurs => `${request.body.emailAddress}`
           subject: `Les gardiens de la légende : Changement de votre mot de passe`, // le sujet du mail
-          text: `Bonjour ${userInDb.firstName} ${userInDb.lastName}, merci de cliquer sur le lien pour vérifier votre email auprés du club de jeu Les gardiens de la légende.`, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
-          html: `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"
-          integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw=="
-          crossorigin="anonymous" />
-      <style>
-      h3 {
-        font-size: 1.5rem;
-    }
-
-    body {
-        background-color: rgb(253, 232, 175);
-    }
-
-    .background {
-        display: flex
-    }
-
-    .medieval {
-        border-radius: 8px;
-        max-height: 500px;
-        height: 300px;
-        width: 1500px;
-        max-width: 100%;
-    }
-    .logo {
-        border-radius: 8px;
-        max-height: 300px;
-        max-width: 300px;
-        width: 2500px;
-        height: 250px;
-        padding: 1rem;
-        position: absolute;
-        left: 800px;
-        top: 10px;
-    }
-    .montext {
-        padding: 2rem 0 0 2rem;
-    }
-    a { 
-      padding: 1rem 0 0 0;
-    }
-      </style>
-      <body>
-          <div class="background">
-      
-              <a href="http://localhost:8080"> <img class="medieval"
-                      src="https://eapi.pcloud.com/getpubthumb?code=XZlztkZqnIb2V9qFI4z3M5DI9gDBQIu0TfX&linkpassword=undefined&size=870x217&crop=0&type=auto"
-                      alt="medieval"> </a>
-      
-              <div><a href="http://localhost:8080"> <img class="logo"
-                          src="https://eapi.pcloud.com/getpubthumb?code=XZoUikZEo78U2gRx1yXF1P6sMJqSVwjXvt7&linkpassword=undefined&size=1024x937&crop=0&type=auto"
-                          alt="logo les gardiens de la légendes"> </a></div>
-          </div>
-      
-          <div class="montext">
-              <h3>Bonjour <span class="username"> ${userInDb.firstName} ${userInDb.lastName}, </span> </h3> <br>
+          text: `Bonjour ${userInDb.firstName} ${userInDb.lastName}, merci de cliquer sur le lien pour vérifier votre email auprés du club de jeu Les gardiens de la légende. ${link}`, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
+          html: emailheaderVerify+`<h3>Bonjour <span class="username"> ${userInDb.firstName} ${userInDb.lastName}, </span> </h3> <br>
               <p>Vous souhaitez réinitialiser votre mot de passe au club de jeux Les gardiens de la legende.</p> <br> 
               <p>Merci de cliquer sur le lien pour changer votre mot de passe. </p> <br>
-              <a href="${link}">cliquez ici pour changer votre mot de passe. </a><br>
-              <br> <p>L'administrateur du site Les gardiens de la légende.</p> <br>
-              <a href="http://localhost:8080"> Les gardiens de la légendes</a>
-      
-          </div>
-      
-      </body>`,
+              <a href="${link}">cliquez ici pour changer votre mot de passe. </a><br>`+emailfooterVerify,
         });
 
         console.log("Message sent: %s", info.messageId);
@@ -1253,76 +933,8 @@ const userController = {
             from: 'lesgardiensdelalegende@gmail.com', //l'envoyeur
             to: `${userInDb.emailAddress}`, // le ou les receveurs => `${newUser.emailAddress}`
             subject: `Vos modification d'information sur le site des Gardiens de la légende à été pris en compte ! ✔`, // le sujet du mail
-            text: `Bonjour ${userInDb.firstName} ${userInDb.lastName},
-            Vous êtes membre du club de jeux des gardiens de la legendes.
-            Vous avez récemment changé vos informations personnelles dans la configuration de votre compte. 😊 
-            Vos changement ont bien été pris en compte ! ✔️
-            En vous remerciant et en espérant vous revoir bientôt autour d'un jeu ! 🤗
-            Bonne journée.
-            L'administrateur du site Les gardiens de la légende.`, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
-            html: `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"
-            integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw=="
-            crossorigin="anonymous" />
-        <style>
-        h3 {
-          font-size: 1.5rem;
-      }
-  
-      body {
-          background-color: rgb(253, 232, 175);
-      }
-  
-      .background {
-          display: flex
-      }
-  
-      .medieval {
-          border-radius: 8px;
-          max-height: 500px;
-          height: 300px;
-          width: 1500px;
-          max-width: 100%;
-      }
-      .logo {
-          border-radius: 8px;
-          max-height: 300px;
-          max-width: 300px;
-          width: 2500px;
-          height: 250px;
-          padding: 1rem;
-          position: absolute;
-          left: 800px;
-          top: 10px;
-      }
-      .montext {
-          padding: 2rem 0 0 2rem;
-      }
-        </style>
-        <body>
-            <div class="background">
-        
-                <a href="http://localhost:8080"> <img class="medieval"
-                        src="https://eapi.pcloud.com/getpubthumb?code=XZlztkZqnIb2V9qFI4z3M5DI9gDBQIu0TfX&linkpassword=undefined&size=870x217&crop=0&type=auto"
-                        alt="medieval"> </a>
-        
-                <div><a href="http://localhost:8080"> <img class="logo"
-                            src="https://eapi.pcloud.com/getpubthumb?code=XZoUikZEo78U2gRx1yXF1P6sMJqSVwjXvt7&linkpassword=undefined&size=1024x937&crop=0&type=auto"
-                            alt="logo les gardiens de la légendes"> </a></div>
-            </div>
-        
-            <div class="montext">
-                <h3>Bonjour <span class="username"> ${userInDb.firstName} ${userInDb.lastName}, </span> </h3> <br>
-                <p>Vous êtes membre du club de jeux des gardiens de la legendes.</p>
-                <p> Votre changement de mot de passe à bien été pris en compte ! ✔️ </p> <br>
-                <p>En vous remerciant et en espérant vous revoir bientôt autour d'un jeu ! 🤗</p>
-                <p> Bonne journée.</p> <br>
-        
-                <p>L'administrateur du site Les gardiens de la légende.</p> <br>
-                <br> <a href="http://localhost:8080"> Les gardiens de la légendes</a>
-        
-            </div>
-        
-        </body>`, // le contenu du mail en format html.
+            text: `Bonjour ${userInDb.firstName} ${userInDb.lastName},`+emailTextUpdateNewPassword, // l'envoie du message en format "plain text" ET HTML, permet plus de souplesse pour le receveur, tout le monde n'accepte pas le format html pour des raisons de sécurité sur ces boites mails, moi le premier ! 
+            html: emailheaderVerify+`<h3>Bonjour <span class="username"> ${userInDb.firstName} ${userInDb.lastName}, </span> </h3> <br>`+emailFooterNewPassword, // le contenu du mail en format html.
           });
 
           console.log("Message sent: %s", info.messageId);
