@@ -7,12 +7,6 @@
 
 #### This project aims to provide a website for a games club. The site is under construction.
 
-## Authors :
-
-* Product Owner : Franck Capon
-* Scrum Master : Laura Grenier
-* Lead dev : Lorène Meslin
-* Git master : Romain Boudet
 
 ## Stack
 
