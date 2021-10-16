@@ -7,6 +7,12 @@
 
 #### This project aims to provide a website for a games club. The site is under construction.
 
+## Authors :
+
+Romain Boudet
+Laura Grenier
+Lorène Meslin
+
 
 ## Stack
 
